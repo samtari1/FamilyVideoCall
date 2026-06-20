@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Grandma Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      overflow: hidden;
+    }
+    .clock {
+      font-size: 80px;
+      margin-top: 60px;
+    }
+    .date {
+      font-size: 36px;
+      margin-bottom: 40px;
+    }
+    .message {
+      font-size: 42px;
+      margin-top: 40px;
+    }
+    .photo {
+      max-width: 80vw;
+      max-height: 55vh;
+      border-radius: 20px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="clock" id="clock"></div>
+  <div class="date" id="date"></div>
+
+  <img class="photo" id="photo" src="" style="display:none;">
+
+  <div class="message">
+    Waiting for family calls...
+  </div>
+
+  <script>
+    function updateTime() {
+      const now = new Date();
+      document.getElementById("clock").textContent =
+        now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      document.getElementById("date").textContent =
+        now.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" });
+    }
+
+    updateTime();
+    setInterval(updateTime, 1000);
+  </script>
+</body>
+</html>

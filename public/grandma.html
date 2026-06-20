@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Grandma Dashboard</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    #dashboard {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #meetingOverlay {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: none;
+      z-index: 10;
+    }
+
+    #meetingFrame {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    #clock {
+      font-size: 90px;
+      margin-bottom: 20px;
+    }
+
+    #message {
+      font-size: 42px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <script src="/shared.js"></script>
+
+  <div id="dashboard">
+    <div id="clock"></div>
+    <div id="message">Waiting for family calls...</div>
+  </div>
+
+  <div id="meetingOverlay" aria-hidden="true">
+    <iframe id="meetingFrame" allow="camera; microphone; display-capture; fullscreen"></iframe>
+  </div>
+
+  <script>
+
+    const ROOM = "GrandmaStationFamilyRoom2026";
+    let isConnectingToCall = false;
+    let isMeetingVisible = false;
+    const meetingOverlay = document.getElementById("meetingOverlay");
+    const meetingFrame = document.getElementById("meetingFrame");
+
+    function updateClock() {
+      const now = new Date();
+
+      document.getElementById("clock").textContent =
+        now.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function showMeeting() {
+      if (isMeetingVisible) {
+        return;
+      }
+
+      isMeetingVisible = true;
+      meetingFrame.src =
+        `https://meet.jit.si/${ROOM}` +
+        "#config.prejoinConfig.enabled=false";
+      meetingOverlay.style.display = "block";
+      meetingOverlay.setAttribute("aria-hidden", "false");
+    }
+
+    function hideMeeting() {
+      if (!isMeetingVisible) {
+        return;
+      }
+
+      isMeetingVisible = false;
+      meetingFrame.src = "about:blank";
+      meetingOverlay.style.display = "none";
+      meetingOverlay.setAttribute("aria-hidden", "true");
+    }
+
+    connectSocket((data) => {
+      if (data.type === "call" && !isConnectingToCall) {
+        isConnectingToCall = true;
+        showMeeting();
+        return;
+      }
+
+      if (data.type === "dashboard") {
+        isConnectingToCall = false;
+        hideMeeting();
+      }
+    });
+
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Family Control</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 80px;
+      background: #f4f4f4;
+    }
+
+    button {
+      font-size: 36px;
+      padding: 25px 50px;
+      margin: 20px;
+      border-radius: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <script src="/shared.js"></script>
+
+  <h1>Grandma Family Portal</h1>
+
+  <button onclick="callGrandma()">Call Grandma</button>
+
+  <button onclick="returnDashboard()">
+    Return To Dashboard
+  </button>
+
+  <script>
+
+    const ROOM = "GrandmaStationFamilyRoom2026";
+    const ws = connectSocket();
+
+    function callGrandma() {
+
+      sendMessage(ws, { type: "call" });
+
+      window.open(
+        `https://meet.jit.si/${ROOM}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+
+    }
+
+    function returnDashboard() {
+
+      sendMessage(ws, { type: "dashboard" });
+
+    }
+
+  </script>
+
+</body>
+</html>
