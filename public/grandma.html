@@ -49,6 +49,7 @@
 
 <body>
 
+  <script src="/config.js"></script>
   <script src="/shared.js"></script>
 
   <div id="dashboard">
@@ -81,14 +82,16 @@
     setInterval(updateClock, 1000);
     updateClock();
 
+
     function showMeeting() {
       if (isMeetingVisible) {
         return;
       }
 
       isMeetingVisible = true;
+      const domain = window.JITSI_DOMAIN || "meet.jit.si";
       meetingFrame.src =
-        `https://meet.jit.si/${ROOM}` +
+        `https://${domain}/${ROOM}` +
         "#config.prejoinConfig.enabled=false";
       meetingOverlay.style.display = "block";
       meetingOverlay.setAttribute("aria-hidden", "false");

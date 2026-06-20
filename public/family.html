@@ -24,6 +24,7 @@
 
 <body>
 
+  <script src="/config.js"></script>
   <script src="/shared.js"></script>
 
   <h1>Grandma Family Portal</h1>
@@ -43,8 +44,10 @@
 
       sendMessage(ws, { type: "call" });
 
+      const domain = window.JITSI_DOMAIN || "meet.jit.si";
+
       window.open(
-        `https://meet.jit.si/${ROOM}`,
+        `https://${domain}/${ROOM}`,
         "_blank",
         "noopener,noreferrer"
       );
