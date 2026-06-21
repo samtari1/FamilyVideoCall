@@ -29,7 +29,13 @@
 
   <h1>Grandma Family Portal</h1>
 
-  <button onclick="callGrandma()">Call Grandma</button>
+  <button onclick="callGrandma()">
+    Call Grandma
+  </button>
+
+  <button onclick="joinCall()">
+    Join Call
+  </button>
 
   <button onclick="returnDashboard()">
     Return To Dashboard
@@ -38,16 +44,24 @@
   <script>
 
     const ROOM = "GrandmaStationFamilyRoom2026";
+
+    const DOMAIN =
+      window.JITSI_DOMAIN || "call.dryangai.com";
+
     const ws = connectSocket();
 
     function callGrandma() {
 
-      sendMessage(ws, { type: "call" });
+      sendMessage(ws, {
+        type: "call"
+      });
 
-      const domain = window.JITSI_DOMAIN || "meet.jit.si";
+    }
+
+    function joinCall() {
 
       window.open(
-        `https://${domain}/${ROOM}`,
+        `https://${DOMAIN}/${ROOM}`,
         "_blank",
         "noopener,noreferrer"
       );
@@ -56,11 +70,12 @@
 
     function returnDashboard() {
 
-      sendMessage(ws, { type: "dashboard" });
+      sendMessage(ws, {
+        type: "dashboard"
+      });
 
     }
 
   </script>
 
 </body>
-</html>
