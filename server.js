@@ -9,6 +9,28 @@ const ALLOWED_MESSAGE_TYPES = new Set(["call", "dashboard"]);
 
 app.use(express.static("public"));
 
+const fs = require("fs");
+const path = require("path");
+
+// Return a JSON list of image filenames located in public/photos
+app.get("/api/photos", (req, res) => {
+  const photosDir = path.join(__dirname, "public", "photos");
+
+  fs.readdir(photosDir, (err, files) => {
+    if (err) {
+      // If folder doesn't exist or other error, return empty list
+      return res.json([]);
+    }
+
+    const images = files.filter((f) => /\.(jpe?g|png|gif|webp)$/i.test(f)).map((f) => 
+      // Serve via the static middleware at /photos/<filename>
+      `/photos/${encodeURIComponent(f)}`
+    );
+
+    res.json(images);
+  });
+});
+
 wss.on("connection", (ws) => {
   ws.on("message", (msg) => {
     let data;

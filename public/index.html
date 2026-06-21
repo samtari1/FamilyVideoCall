@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Grandma Dashboard</title>
+
+  
   <style>
     body {
       margin: 0;
@@ -30,13 +32,70 @@
       border-radius: 20px;
       margin-top: 20px;
     }
+    /* Carousel styles */
+    .carousel {
+      position: relative;
+      width: 80vw;
+      height: 55vh;
+      margin: 20px auto 0;
+      overflow: hidden;
+      border-radius: 20px;
+      background: #000;
+    }
+    .carousel-track {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: none;
+      transition: opacity 500ms ease-in-out;
+      background: #000;
+    }
+    .slide.active {
+      display: block;
+      opacity: 1;
+    }
+    .carousel button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.4);
+      border: none;
+      color: white;
+      font-size: 40px;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    .carousel button:hover { background: rgba(0,0,0,0.6); }
+    .carousel #prev { left: 10px; }
+    .carousel #next { right: 10px; }
+    .dots { position: absolute; left: 50%; transform: translateX(-50%); bottom: 12px; }
+    .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.4); margin: 0 6px; cursor: pointer; }
+    .dot.active { background: rgba(255,255,255,0.95); }
   </style>
 </head>
 <body>
+
+  <script src="/config.js"></script>
+  <script src="/shared.js"></script>
+  
   <div class="clock" id="clock"></div>
   <div class="date" id="date"></div>
 
-  <img class="photo" id="photo" src="" style="display:none;">
+  <div id="carousel" class="carousel" aria-label="Photo carousel">
+    <div id="carouselTrack" class="carousel-track"></div>
+    <button id="prev" aria-label="Previous">‹</button>
+    <button id="next" aria-label="Next">›</button>
+    <div id="dots" class="dots" aria-hidden="false"></div>
+  </div>
 
   <div class="message">
     Waiting for family calls...
@@ -53,6 +112,96 @@
 
     updateTime();
     setInterval(updateTime, 1000);
+
+    // Carousel: fetch image list from server and build slides
+    (function() {
+      const track = document.getElementById('carouselTrack');
+      const dots = document.getElementById('dots');
+      const prev = document.getElementById('prev');
+      const next = document.getElementById('next');
+      let slides = [];
+      let current = 0;
+      let timer = null;
+
+      function showSlide(idx) {
+        slides.forEach((s, i) => {
+          s.classList.toggle('active', i === idx);
+        });
+        Array.from(dots.children).forEach((d, i) => d.classList.toggle('active', i === idx));
+        current = idx;
+      }
+
+      function startAuto() {
+        stopAuto();
+        timer = setInterval(() => showSlide((current + 1) % slides.length), 4000);
+      }
+
+      function stopAuto() { if (timer) { clearInterval(timer); timer = null; } }
+
+      prev.addEventListener('click', () => {
+        if (!slides.length) return;
+        showSlide((current - 1 + slides.length) % slides.length);
+        startAuto();
+      });
+      next.addEventListener('click', () => {
+        if (!slides.length) return;
+        showSlide((current + 1) % slides.length);
+        startAuto();
+      });
+
+      // Pause on hover
+      const carousel = document.getElementById('carousel');
+      carousel.addEventListener('mouseenter', stopAuto);
+      carousel.addEventListener('mouseleave', startAuto);
+
+      fetch('/api/photos')
+        .then(r => r.json())
+        .then(list => {
+          if (!list || !list.length) {
+            // No photos: hide carousel
+            carousel.style.display = 'none';
+            return;
+          }
+
+          list.forEach((url, i) => {
+            const img = document.createElement('img');
+            img.src = url;
+            img.className = 'slide';
+            img.alt = `Photo ${i+1}`;
+            track.appendChild(img);
+            slides.push(img);
+
+            const dot = document.createElement('span');
+            dot.className = 'dot';
+            dot.addEventListener('click', () => { showSlide(i); startAuto(); });
+            dots.appendChild(dot);
+          });
+
+          showSlide(0);
+          startAuto();
+        })
+        .catch(() => { document.getElementById('carousel').style.display = 'none'; });
+    })();
+    const ROOM = "GrandmaStationFamilyRoom2026";
+
+    const ws = new WebSocket(`ws://${location.host}`);
+
+    ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+
+    if (data.type === "call") {
+      const domain = window.JITSI_DOMAIN || "meet.jit.si";
+
+      window.location.href =
+        `https://${domain}/${ROOM}` +
+        "#config.prejoinConfig.enabled=false";
+    }
+
+    if (data.type === "dashboard") {
+      window.location.href = "/";
+    }
+  };
+    
   </script>
 </body>
 </html>

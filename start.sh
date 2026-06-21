@@ -4,7 +4,15 @@ echo "===================================="
 echo "Starting Grandma Station..."
 echo "===================================="
 
-pkill -f "chromium.*grandma.html" 2>/dev/null || true
+
+# Fix audio
+sleep 5
+
+pactl set-default-sink alsa_output.pci-0000_03_00.6.analog-stereo
+pactl set-sink-volume @DEFAULT_SINK@ 100%
+pactl set-sink-mute @DEFAULT_SINK@ 0
+
+pkill -f chromium 2>/dev/null || true
 pkill -f "node server.js" 2>/dev/null || true
 
 sleep 2
@@ -31,6 +39,6 @@ chromium \
   --no-first-run \
   --disable-session-crashed-bubble \
   --disable-infobars \
-  http://localhost:3000/grandma.html &
+  http://localhost:3000 &
 
 echo "Grandma Station Ready!"
