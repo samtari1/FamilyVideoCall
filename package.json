@@ -5,13 +5,17 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "tv:discover": "node tv/discover.js",
+    "tv:learn": "node tv/learn.js",
+    "tv:send": "node tv/send.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^5.2.1",
+    "node-broadlink": "^2.4.1",
     "ws": "^8.21.0"
   }
 }

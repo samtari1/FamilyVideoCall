@@ -1,0 +1,6 @@
+{
+  "power": "ir-codes/power.txt",
+  "hdmi1": "ir-codes/hdmi1.txt",
+  "hdmi2": "ir-codes/hdmi2.txt",
+  "mute": "ir-codes/mute.txt"
+}

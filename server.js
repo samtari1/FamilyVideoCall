@@ -1,6 +1,7 @@
 const express = require("express");
 const http = require("http");
 const WebSocket = require("ws");
+const tvController = require("./tv/tvController");
 
 const app = express();
 const server = http.createServer(app);
@@ -43,6 +44,12 @@ wss.on("connection", (ws) => {
 
     if (!data || !ALLOWED_MESSAGE_TYPES.has(data.type)) {
       return;
+    }
+
+    if (data.type === "call") {
+      void tvController.handlePortalAction("call").catch((error) => {
+        console.error("TV control failed:", error.message);
+      });
     }
 
     const payload = JSON.stringify({ type: data.type });
