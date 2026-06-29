@@ -10,9 +10,13 @@ echo "===================================="
 
 sleep 5
 
-pactl set-default-sink alsa_output.pci-0000_03_00.6.analog-stereo
-pactl set-sink-volume @DEFAULT_SINK@ 100%
-pactl set-sink-mute @DEFAULT_SINK@ 0
+if command -v pactl >/dev/null 2>&1; then
+  pactl set-default-sink alsa_output.pci-0000_03_00.6.analog-stereo
+  pactl set-sink-volume @DEFAULT_SINK@ 100%
+  pactl set-sink-mute @DEFAULT_SINK@ 0
+else
+  echo "Skipping audio setup: pactl not found"
+fi
 
 pkill -f chromium 2>/dev/null || true
 pkill -f "node server.js" 2>/dev/null || true
@@ -36,11 +40,17 @@ fi
 
 echo "Launching Dashboard..."
 
-chromium \
-  --kiosk \
-  --no-first-run \
-  --disable-session-crashed-bubble \
-  --disable-infobars \
-  http://localhost:3000 &
+if command -v chromium >/dev/null 2>&1; then
+    chromium \
+      --kiosk \
+      --no-first-run \
+      --disable-session-crashed-bubble \
+      --disable-infobars \
+      http://localhost:3000 &
+elif command -v open >/dev/null 2>&1; then
+    open http://localhost:3000
+else
+    echo "Skipping browser launch: no Chromium or open command found"
+fi
 
 echo "Grandma Station Ready!"
